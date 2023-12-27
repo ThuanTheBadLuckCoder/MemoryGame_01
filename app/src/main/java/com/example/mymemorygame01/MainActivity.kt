@@ -3,7 +3,9 @@ package com.example.mymemorygame01
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.view.Gravity
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.gridlayout.widget.GridLayout
@@ -16,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     private val buttons = Array(gridSize) { arrayOfNulls<Button>(gridSize) }
     private val correctButtons = mutableListOf<Button>()
     private val handler = Handler()
+    private var playerScore = 60
+    private var penalty = 10
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,28 +28,40 @@ class MainActivity : AppCompatActivity() {
         gridLayout = findViewById(R.id.gridLayout)
 
         initializeGrid()
-        displayRandomColors()
+        // displayRandomColors() không còn được gọi ở đây nữa
     }
 
     private fun initializeGrid() {
-        for (i in 0 until gridSize) {
-            for (j in 0 until gridSize) {
-                buttons[i][j] = Button(this).apply {
-                    val button = this
-                    layoutParams = GridLayout.LayoutParams(GridLayout.spec(i, GridLayout.FILL, 1f), GridLayout.spec(j, GridLayout.FILL, 1f)).apply {
-                        width = 0
-                        height = 0
-                        setMargins(5, 5, 5, 5)
+        gridLayout.post {
+            val gridWidth = gridLayout.width - (gridLayout.paddingLeft + gridLayout.paddingRight)
+            val gridHeight = gridLayout.height - (gridLayout.paddingTop + gridLayout.paddingBottom)
+
+            val buttonSize = Math.min(gridWidth, gridHeight) / gridSize
+
+            for (i in 0 until gridSize) {
+                for (j in 0 until gridSize) {
+                    buttons[i][j] = Button(this).apply {
+                        layoutParams = GridLayout.LayoutParams().apply {
+                            width = buttonSize - 10 * 2
+                            height = buttonSize - 10 * 2
+                            setMargins(5, 5, 5, 5)
+                            // Chỉnh layout_gravity để căn giữa theo chiều ngang và chiều dọc
+                            gravity = Gravity.CENTER
+                        }
+                        setBackgroundColor(Color.WHITE)
+                        setOnClickListener {
+                            checkButton(this)
+                        }
                     }
-                    setBackgroundColor(Color.WHITE)
-                    setOnClickListener {
-                        checkButton(button)
-                    }
+                    gridLayout.addView(buttons[i][j])
                 }
-                gridLayout.addView(buttons[i][j])
             }
+
+            displayRandomColors()
         }
     }
+
+
 
     private fun displayRandomColors() {
         val random = Random(System.currentTimeMillis())
@@ -74,7 +90,16 @@ class MainActivity : AppCompatActivity() {
             button.setBackgroundColor(Color.GREEN)
         } else {
             button.setBackgroundColor(Color.RED)
+            playerScore -= penalty
+            penalty += 10 // Tăng hình phạt cho lần sai tiếp theo
+
+            if (playerScore <= 0) {
+                endGame()
+            }
         }
-        // Logic for ending the game or scoring can go here
+    }
+
+    private fun endGame() {
+        Toast.makeText(this, "Game Over! Your score: $playerScore", Toast.LENGTH_LONG).show()
     }
 }
