@@ -1,3 +1,5 @@
+package com.example.mymemorygame01
+
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -7,7 +9,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.gridlayout.widget.GridLayout
-import com.example.mymemorygame01.R
 import kotlin.random.Random
 
 class Game01Activity : AppCompatActivity() {

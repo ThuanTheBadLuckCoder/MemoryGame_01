@@ -1,6 +1,5 @@
 package com.example.mymemorygame01
 
-import Game01Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
