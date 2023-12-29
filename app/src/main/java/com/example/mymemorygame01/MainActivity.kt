@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.gridlayout.widget.GridLayout
 import kotlin.random.Random
@@ -20,6 +21,9 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler()
     private var playerScore = 60
     private var penalty = 10
+    private var buttonsPressed = 0
+    private val maxButtonsToPress = 5
+    private var gameEnded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,39 +32,32 @@ class MainActivity : AppCompatActivity() {
         gridLayout = findViewById(R.id.gridLayout)
 
         initializeGrid()
-        // displayRandomColors() không còn được gọi ở đây nữa
     }
 
     private fun initializeGrid() {
         gridLayout.post {
             val gridWidth = gridLayout.width - (gridLayout.paddingLeft + gridLayout.paddingRight)
-            val gridHeight = gridLayout.height - (gridLayout.paddingTop + gridLayout.paddingBottom)
-
-            val buttonSize = Math.min(gridWidth, gridHeight) / gridSize
+            val buttonSize = (gridWidth / gridSize) - 2 // Adjust for border
 
             for (i in 0 until gridSize) {
                 for (j in 0 until gridSize) {
-                    buttons[i][j] = Button(this).apply {
-                        layoutParams = GridLayout.LayoutParams().apply {
-                            width = buttonSize - 10 * 2
-                            height = buttonSize - 10 * 2
-                            setMargins(5, 5, 5, 5)
-                            // Chỉnh layout_gravity để căn giữa theo chiều ngang và chiều dọc
-                            gravity = Gravity.CENTER
+                    buttons[i][j] = Button(this).also { button ->
+                        button.layoutParams = GridLayout.LayoutParams().apply {
+                            width = buttonSize
+                            height = buttonSize
+                            setMargins(1, 1, 1, 1)
                         }
-                        setBackgroundColor(Color.WHITE)
-                        setOnClickListener {
-                            checkButton(this)
+                        button.background = ContextCompat.getDrawable(this, R.drawable.button_border)
+                        gridLayout.addView(button)
+                        button.setOnClickListener {
+                            checkButton(button)
                         }
                     }
-                    gridLayout.addView(buttons[i][j])
                 }
             }
-
-            displayRandomColors()
+            displayRandomColors() // Ensure this is called to set up the game
         }
     }
-
 
 
     private fun displayRandomColors() {
@@ -86,20 +83,36 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkButton(button: Button) {
+        if(gameEnded) {
+            // Nếu trò chơi đã kết thúc, không xử lý các nhấn nút nữa
+            return
+        }
         if (button in correctButtons) {
             button.setBackgroundColor(Color.GREEN)
         } else {
             button.setBackgroundColor(Color.RED)
             playerScore -= penalty
             penalty += 10 // Tăng hình phạt cho lần sai tiếp theo
+        }
 
-            if (playerScore <= 0) {
-                endGame()
-            }
+        buttonsPressed++
+        if (buttonsPressed >= maxButtonsToPress || playerScore <= 0) {
+            endGame()
         }
     }
 
     private fun endGame() {
-        Toast.makeText(this, "Game Over! Your score: $playerScore", Toast.LENGTH_LONG).show()
+        gameEnded = true
+        runOnUiThread {
+            Toast.makeText(this, "Game Over! Your score: $playerScore", Toast.LENGTH_LONG).show()
+            disableButtons()
+        }
+    }
+    private fun disableButtons() {
+        for (i in 0 until gridSize) {
+            for (j in 0 until gridSize) {
+                buttons[i][j]?.isEnabled = false
+            }
+        }
     }
 }
