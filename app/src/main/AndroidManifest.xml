@@ -22,7 +22,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Game01Activity"></activity>
+        <activity
+            android:name=".Game01Activity"
+            android:exported="false"> <!-- Đặt exported="true" nếu muốn hoạt động này có thể được khởi động từ bên ngoài ứng dụng -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
 
 
     </application>
