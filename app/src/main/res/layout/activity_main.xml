@@ -36,8 +36,9 @@
         android:layout_height="80dp"
         android:layout_below="@id/textViewBrainTrain"
         android:layout_marginLeft="20dp"
-        android:layout_alignParentLeft="true"
-        android:background="@drawable/img_game01" />
+        android:layout_alignParentLeft="true" />
+<!--        android:background="@drawable/img_game01" -->
+
 
     <TextView
         android:layout_width="wrap_content"
