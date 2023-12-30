@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyMemoryGame01</string>
+    <string name="card_description">Card Description</string>
 </resources>

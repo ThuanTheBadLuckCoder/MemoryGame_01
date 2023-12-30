@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/mainLayout"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/scoreTextView"
+    <!-- ImageView for the first card -->
+    <!-- ImageView for the first card -->
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/card_1"
+        android:contentDescription="@string/card_description"
+        custom:randomImage="@drawable/card_1" />
+
+    <!-- ImageView for the second card -->
+    <ImageView
+        android:id="@+id/cardImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Score: 0"
-        android:textSize="24sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:src="@drawable/card_placeholder"
+        android:contentDescription="@string/card_description"
+        custom:randomImage="@drawable/card_1" />
 
-    <TextView
-        android:id="@+id/highScoreTextView"
-        android:layout_width="wrap_content"
+    <!-- ImageView for the third card -->
+    <ImageView
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="High Score: 0"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/scoreTextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_weight="1"
+        android:src="@drawable/card_9"
+        android:contentDescription="@string/card_description"
+        custom:randomImage="@drawable/card_1" />
 
-    <!-- The cards will be added dynamically to the main layout -->
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
