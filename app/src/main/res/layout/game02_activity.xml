@@ -8,21 +8,18 @@
     android:padding="16dp">
 
     <!-- ImageView for the first card -->
-    <!-- ImageView for the first card -->
     <ImageView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:src="@drawable/card_1"
-        android:contentDescription="@string/card_description"
-        custom:randomImage="@drawable/card_1" />
+        android:contentDescription="@string/card_description" />
 
     <!-- ImageView for the second card -->
     <ImageView
         android:id="@+id/cardImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/card_placeholder"
         android:contentDescription="@string/card_description"
         custom:randomImage="@drawable/card_1" />
 
@@ -32,7 +29,5 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:src="@drawable/card_9"
-        android:contentDescription="@string/card_description"
-        custom:randomImage="@drawable/card_1" />
-
+        android:contentDescription="@string/card_description" />
 </LinearLayout>

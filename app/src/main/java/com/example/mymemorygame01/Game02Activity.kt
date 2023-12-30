@@ -22,3 +22,4 @@ class Game02Activity : AppCompatActivity() {
         cardImageView.setImageResource(resourceId)
     }
 }
+
