@@ -1,35 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:gravity="center"
-    android:padding="16dp"
-    tools:context=".Game02Activity">
+    android:padding="16dp">
+    <ImageView
+    android:id="@+id/cardImageView1"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:contentDescription="@string/card_description"
+    android:onClick="onCardClick"
+    android:tag="card_1"
+    android:visibility="visible"
+    android:layout_marginStart="20dp"
+        />
+
 
     <ImageView
-        android:id="@+id/cardImageView1"
+    android:id="@+id/cardImageView2"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:contentDescription="@string/card_description"
+    android:onClick="onCardClick"
+    android:tag="card_2"
+    android:visibility="visible"
+    android:layout_marginStart="20dp"
+        />
+
+    <!-- ImageView for the third card -->
+    <ImageView
+    android:id="@+id/cardImageView3"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:contentDescription="@string/card_description"
+    android:onClick="onCardClick"
+    android:tag="card_3"
+    android:visibility="visible"
+    android:layout_marginStart="20dp"
+        />
+    <ImageView
+        android:id="@+id/cardImageView4"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:contentDescription="@string/card_description"
-        android:tag=""
-        android:layout_marginRight="20dp" /> <!-- Đặt margin bên phải -->
+        android:onClick="onCardClick"
+        android:tag="card_4"
+        android:visibility="invisible"
+        android:layout_marginStart="20dp"
+        />
 
     <ImageView
-        android:id="@+id/cardImageView2"
+        android:id="@+id/cardImageView5"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:contentDescription="@string/card_description"
-        android:tag=""
-        android:layout_marginRight="20dp" /> <!-- Đặt margin bên phải -->
+        android:onClick="onCardClick"
+        android:tag="card_3"
+        android:visibility="invisible"
+        android:layout_marginStart="20dp"
+        />
 
-    <ImageView
-        android:id="@+id/cardImageView3"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:contentDescription="@string/card_description"
-        android:tag="" />
 
-    <!-- Thêm thêm ImageView nếu cần -->
-</LinearLayout>
+    </LinearLayout>
+
+
