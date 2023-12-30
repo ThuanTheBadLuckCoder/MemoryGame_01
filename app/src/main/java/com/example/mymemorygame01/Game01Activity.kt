@@ -17,8 +17,13 @@ class Game01Activity : AppCompatActivity() {
     private val buttons = Array(gridSize) { arrayOfNulls<Button>(gridSize) }
     private val correctButtons = mutableListOf<Button>()
     private val handler = Handler()
-    private var playerScore = 60
-    private var penalty = 10
+    private var mistakesMade = 0
+    private var allowedMistakes = 0
+    private val buttonStates = mutableMapOf<Button, Boolean>()
+    private var isGameActive = true
+    private var correctPresses = 0
+    private val totalColorsToShow = 5
+    private var isDisplayingColors = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +31,9 @@ class Game01Activity : AppCompatActivity() {
         gridLayout = findViewById(R.id.gridLayout)
 
         initializeGrid()
+        setupLayoutChangeListener()
+
+
     }
 
     private fun initializeGrid() {
@@ -37,62 +45,144 @@ class Game01Activity : AppCompatActivity() {
 
             for (i in 0 until gridSize) {
                 for (j in 0 until gridSize) {
-                    buttons[i][j] = Button(this).apply {
+                    val button = Button(this).apply {
+                        // Cấu hình kích thước và khoảng cách của nút
                         layoutParams = GridLayout.LayoutParams().apply {
-                            width = buttonSize - 10 * 2
-                            height = buttonSize - 10 * 2
-                            setMargins(5, 5, 5, 5)
-                            // Chỉnh layout_gravity để căn giữa theo chiều ngang và chiều dọc
-                            gravity = Gravity.CENTER
+                            width = buttonSize - 2 // Trừ đi kích thước viền
+                            height = buttonSize - 2 // Trừ đi kích thước viền
+                            setMargins(1, 1, 1, 1) // Đặt khoảng cách là 1px
                         }
+
                         setBackgroundColor(Color.WHITE)
-                        setOnClickListener {
-                            checkButton(this)
+                        setOnClickListener { checkButton(this)
                         }
                     }
-                    gridLayout.addView(buttons[i][j])
+                    gridLayout.addView(button)
+                    buttons[i][j] = button
+                    buttonStates[button] = false
                 }
             }
-
             displayRandomColors()
+        }
+
+    }
+
+    private fun setupLayoutChangeListener() {
+        val observer = gridLayout.viewTreeObserver
+        observer.addOnGlobalLayoutListener {
+            val gridWidth = gridLayout.width - (gridLayout.paddingLeft + gridLayout.paddingRight)
+            val gridHeight = gridLayout.height - (gridLayout.paddingTop + gridLayout.paddingBottom)
+            val buttonSize = Math.min(gridWidth, gridHeight) / gridSize
+
+            for (i in 0 until gridSize) {
+                for (j in 0 until gridSize) {
+                    val button = buttons[i][j]
+                    button?.layoutParams?.width = buttonSize - 2 // Adjust for border
+                    button?.layoutParams?.height = buttonSize - 2 // Adjust for border
+                }
+            }
         }
     }
 
+
+    // Trong phương thức displayRandomColors()
     private fun displayRandomColors() {
+        isDisplayingColors = true
         val random = Random(System.currentTimeMillis())
-        val numberOfColors = 5 // Number of colored blocks to show
+        val numberOfColors = totalColorsToShow // Đảm bảo luôn là 5
+        allowedMistakes = 2
+        mistakesMade = 0
         correctButtons.clear()
+
+        // Tắt tất cả các nút trong grid
         for (button in gridLayout.children) {
+            (button as Button).isEnabled = false
             (button as Button).setBackgroundColor(Color.WHITE)
         }
-        repeat(numberOfColors) {
+
+        var colorsDisplayed = 0
+        while (colorsDisplayed < numberOfColors) {
             val i = random.nextInt(gridSize)
             val j = random.nextInt(gridSize)
             val button = buttons[i][j]!!
-            button.setBackgroundColor(Color.YELLOW)
-            correctButtons.add(button)
+            if (!correctButtons.contains(button)) {
+                button.setBackgroundColor(Color.YELLOW)
+                correctButtons.add(button)
+                colorsDisplayed++
+            }
         }
+
         handler.postDelayed({
+            // Bật lại tất cả các nút và xóa màu
+            for (button in gridLayout.children) {
+                (button as Button).isEnabled = true
+                (button as Button).setBackgroundColor(Color.WHITE)
+            }
             correctButtons.forEach { it.setBackgroundColor(Color.WHITE) }
+            isDisplayingColors = false
         }, 3000)
     }
 
+
+
     private fun checkButton(button: Button) {
+        if (!isGameActive) {
+            return
+        }
         if (button in correctButtons) {
             button.setBackgroundColor(Color.GREEN)
+            buttonStates[button] = true
+            correctPresses++
+
+            if (correctPresses == totalColorsToShow) {
+                Toast.makeText(this, "Great! Starting next round...", Toast.LENGTH_SHORT).show()
+                resetGame()
+            }
         } else {
             button.setBackgroundColor(Color.RED)
-            playerScore -= penalty
-            penalty += 10 // Tăng hình phạt cho lần sai tiếp theo
+            mistakesMade++
 
-            if (playerScore <= 0) {
-                endGame()
+            if (mistakesMade > allowedMistakes) {
+                endGameWithLoss()
             }
         }
     }
 
-    private fun endGame() {
-        Toast.makeText(this, "Game Over! Your score: $playerScore", Toast.LENGTH_LONG).show()
-    }
-}
 
+    private fun endGameWithLoss() {
+        isGameActive = false
+        Toast.makeText(this, "You Lost! Too many mistakes.", Toast.LENGTH_LONG).show()
+    }
+
+    private fun checkForWin() {
+        if (buttonStates.values.all { it }) {
+            Toast.makeText(this, "Congratulations! You won!", Toast.LENGTH_LONG).show()
+            resetGame()
+        }
+    }
+
+
+    private fun resetGame() {
+        if (mistakesMade <= allowedMistakes) {
+            correctButtons.clear()
+            buttonStates.clear()
+            correctPresses = 0
+
+            for (button in gridLayout.children) {
+                (button as Button).setBackgroundColor(Color.WHITE)
+                buttonStates[button] = false
+            }
+            mistakesMade = 0 // Reset số lỗi
+            displayRandomColors() // Hiển thị lại các màu ngẫu nhiên
+        } else {
+            // Có thể hiển thị thông báo hoặc thực hiện hành động khác nếu cần
+            Toast.makeText(this, "Can't reset, too many mistakes made!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun exitGame() {
+        finish()
+    }
+
+
+}
