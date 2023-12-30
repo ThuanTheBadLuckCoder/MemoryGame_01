@@ -1,124 +1,117 @@
 package com.example.mymemorygame01
 
-import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.gridlayout.widget.GridLayout
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.setMargins
 
 class Game02Activity : AppCompatActivity() {
-    private lateinit var gridLayout: GridLayout
+
+    private lateinit var mainLayout: ConstraintLayout
     private lateinit var scoreTextView: TextView
     private lateinit var highScoreTextView: TextView
-    private lateinit var exitButton: Button
-    private lateinit var restartButton: Button
-    private var currentLevel = 1
     private var score = 0
     private var highScore = 0
-    private var selectedIndices = mutableSetOf<Int>()
-    private var currentRound = 0
+    private val cards = mutableListOf<Button>()
+    private val selectedCards = mutableSetOf<Int>()
+    private var currentLevel = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.game02_activity)
 
-        gridLayout = findViewById(R.id.gridLayout)
+        mainLayout = findViewById(R.id.mainLayout)
         scoreTextView = findViewById(R.id.scoreTextView)
         highScoreTextView = findViewById(R.id.highScoreTextView)
-        exitButton = findViewById(R.id.exitButton)
-        restartButton = findViewById(R.id.restartButton)
-
-        exitButton.setOnClickListener { finish() }
-        restartButton.setOnClickListener { restartGame() }
 
         setupGame()
     }
 
     private fun setupGame() {
-        currentLevel = 1
+        // Initialize game state, shuffle cards, display them, etc.
         score = 0
-        highScore = 0 // This should be loaded from SharedPreferences or another persistent storage
-        currentRound = 0
-        selectedIndices.clear()
-        gridLayout.removeAllViews()
-        populateGrid()
-        updateScore()
+        highScore = loadHighScore() // Implement this method to load the high score
+        currentLevel = 1
+        selectedCards.clear()
+        displayCards(currentLevel + 2)
     }
 
-    private fun populateGrid() {
-        val cardCount = currentLevel + 2
-        gridLayout.columnCount = cardCount
-        gridLayout.rowCount = 1
-
-        for (i in 0 until cardCount) {
-            val button = Button(this)
-            button.id = i
-            button.text = "Card $i"
-            button.setBackgroundColor(Color.LTGRAY)
-            button.setOnClickListener { onCardSelected(it.id) }
-            gridLayout.addView(button)
+    private fun displayCards(count: Int) {
+        mainLayout.removeAllViews()
+        // Assume you have a drawable for each card and identifiers are card_1, card_2, etc.
+        val drawables = (1..count).map { resourceIdForCard(it) }
+        drawables.shuffle()
+        drawables.forEachIndexed { index, drawableId ->
+            val card = Button(this).apply {
+                setBackgroundResource(drawableId)
+                id = View.generateViewId()
+                val params = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(8)
+                layoutParams = params
+                setOnClickListener { onCardSelected(index) }
+            }
+            cards.add(card)
+            mainLayout.addView(card)
         }
     }
 
-    private fun onCardSelected(cardId: Int) {
-        if (currentRound >= currentLevel) {
-            endLevel(false)
-            return
-        }
-
-        if (selectedIndices.contains(cardId)) {
-            // Player selected the same card as in previous rounds
-            endLevel(false)
+    private fun onCardSelected(cardIndex: Int) {
+        if (selectedCards.contains(cardIndex)) {
+            // Player selected a previously selected card
+            endRound(false)
         } else {
-            selectedIndices.add(cardId)
-            score += 500 * currentLevel
-            if (currentRound < currentLevel - 1) {
-                // Continue to next round
-                currentRound++
-            } else {
-                // Completed level
-                endLevel(true)
+            selectedCards.add(cardIndex)
+            score += 500 // Plus any additional bonus calculations
+            scoreTextView.text = "Score: $score"
+            if (selectedCards.size == currentLevel + 2) {
+                endRound(true)
             }
         }
-        updateScore()
     }
 
-    private fun endLevel(success: Boolean) {
+    private fun endRound(success: Boolean) {
         if (success) {
-            score += selectedIndices.size * 100 * currentLevel
-            currentLevel++
-            if (currentLevel > 3) {
-                currentLevel = 1 // Reset level after level 3
+            // Calculate bonus points
+            score += selectedCards.size * 100 * currentLevel
+            if (currentLevel == 3) {
+                // Game completed
+                saveHighScore(score)
                 showEndGameMessage(true)
+                currentLevel = 1
+            } else {
+                currentLevel++
             }
-            setupGame()
+            displayCards(currentLevel + 2)
         } else {
+            // Round lost
             showEndGameMessage(false)
-            restartGame()
+            currentLevel = 1
+            displayCards(currentLevel + 2)
         }
-        updateScore()
-    }
-
-    private fun restartGame() {
-        setupGame()
-    }
-
-    private fun updateScore() {
         scoreTextView.text = "Score: $score"
-        if (score > highScore) {
-            highScore = score
-            highScoreTextView.text = "High Score: $highScore"
-            // Save the new high score to SharedPreferences or another persistent storage
-        }
     }
 
     private fun showEndGameMessage(won: Boolean) {
-        // Show a message to the player. Use a Toast, Snackbar, or a Dialog.
-        if (won) {
-            // Show winning message
-        } else {
-            // Show losing message
-        }
+        // Show a Toast or Dialog here
+    }
+
+    private fun saveHighScore(score: Int) {
+        // Implement this to save high score
+    }
+
+    private fun loadHighScore(): Int {
+        // Implement this to load high score
+        return 0
+    }
+
+    private fun resourceIdForCard(cardNumber: Int): Int {
+        // Implement this to return the correct drawable resource ID for each card
+        return R.drawable.card_placeholder // Replace with actual drawable resource
     }
 }
