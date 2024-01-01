@@ -2,7 +2,6 @@ package com.example.mymemorygame01
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -11,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 class Game02Activity : AppCompatActivity() {
     private lateinit var cardImageViews: Array<ImageView>
     private val cardImages = mutableListOf(
+        // Danh sách tên hình ảnh của các thẻ
         "card01", "card02", "card03", "card04", "card05",
         "card06", "card07", "card08", "card09", "card10",
         "card11", "card12", "card13", "card14", "card15",
@@ -19,10 +19,8 @@ class Game02Activity : AppCompatActivity() {
     )
     private val selectedCards = mutableListOf<String>()
     private var round = 1
-    private var lastRoundCards = mutableListOf<String>()
-
-    private var recentCards = ArrayDeque<String>(2)
-    private var cardAbsenceTracker = mutableMapOf<String, Int>()
+    private var lastSelectedCard: String? = null
+    private var previousRoundCards = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,16 +38,9 @@ class Game02Activity : AppCompatActivity() {
     }
 
     private fun initGame() {
-        // Đảm bảo rằng 5 lá bài được chọn ngẫu nhiên không trùng lặp
         selectedCards.clear()
-        lastRoundCards.clear()
-        cardAbsenceTracker.clear()
-        recentCards.clear()
-
-        val shuffledCards = cardImages.shuffled()
-        for (i in 0 until 5) {
-            selectedCards.add(shuffledCards[i])
-        }
+        lastSelectedCard = null
+        selectedCards.addAll(cardImages.shuffled().take(5))
         updateCardDisplay()
     }
 
@@ -67,57 +58,65 @@ class Game02Activity : AppCompatActivity() {
     fun onCardClick(view: View) {
         if (view is ImageView) {
             val cardName = view.tag as String
-            val isCorrectChoice = round == 1 || !lastRoundCards.contains(cardName)
-
-            if (isCorrectChoice) {
-                processCorrectSelection(cardName)
-            } else {
-                showLostDialog()
-            }
+            processSelection(cardName)
         }
     }
 
-
-    private fun processCorrectSelection(cardName: String) {
-        // Cập nhật lastRoundCards và chuẩn bị cho round tiếp theo
+    private fun processSelection(cardName: String) {
         if (round == 1) {
-            lastRoundCards.clear()
-            lastRoundCards.addAll(selectedCards.filter { it != cardName })
+            prepareNextRound(cardName)
+            round++
+        } else if (cardName == lastSelectedCard) {
+            Toast.makeText(this, "Correct! Moving to next round.", Toast.LENGTH_SHORT).show()
+            prepareNextRound(cardName)
+            round++
+        } else {
+            showLostDialog()
         }
-
-        prepareNextRound(cardName)
-        round++
     }
 
     private fun prepareNextRound(selectedCard: String) {
-        // Chọn một lá bài mới và trộn với các lá bài cũ
-        val newCards = if (round == 1) {
-            (cardImages - selectedCards).shuffled().take(1)
-        } else {
-            listOf(selectedCard)
+        // Trong vòng đầu tiên, chỉ đặt lastSelectedCard là lá bài được chọn
+        if (round == 1) {
+            lastSelectedCard = selectedCard
+            return
         }
 
-        selectedCards.clear()
-        selectedCards.addAll(lastRoundCards)
-        selectedCards.addAll(newCards)
-        selectedCards.shuffle()
+        // Từ vòng thứ hai trở đi, random một lá bài mới không trùng với các lá bài hiện tại và lá bài được chọn
+        val availableCards = (cardImages - selectedCards - selectedCard)
+        val newCard = availableCards.shuffled().first()
+
+        // Cập nhật lastSelectedCard và danh sách các lá bài cho vòng tiếp theo
+        lastSelectedCard = newCard
+        selectedCards.remove(selectedCard) // Loại bỏ lá bài được chọn ở vòng trước
+        selectedCards.add(newCard)         // Thêm lá bài mới
+        selectedCards.shuffle()            // Trộn lẫn vị trí của các lá bài
 
         updateCardDisplay()
     }
 
+
+
     private fun showLostDialog() {
-        Toast.makeText(this, "Lost dialog should appear", Toast.LENGTH_SHORT).show()
-        // Rest of your code for showing the dialog
-        // ...
-    }
-
-
-    private fun updateCardAbsence(selectedCard: String) {
-        cardAbsenceTracker.keys.forEach { card ->
-            if (card != selectedCard) {
-                cardAbsenceTracker[card] = (cardAbsenceTracker[card] ?: 0) + 1
-            }
+        // Vô hiệu hóa click vào các ImageView
+        cardImageViews.forEach { imageView ->
+            imageView.isClickable = false
         }
-    }
 
+        // Tạo và hiển thị AlertDialog
+        AlertDialog.Builder(this)
+            .setTitle("Game Over")
+            .setMessage("You lost the game. Do you want to exit?")
+            .setPositiveButton("Exit") { dialog, which ->
+                // Thoát khỏi Activity
+                finish()
+            }
+            .setNegativeButton("Cancel") { dialog, which ->
+                // Nếu người chơi chọn 'Cancel', cho phép chơi lại
+                dialog.dismiss()
+                initGame()
+            }
+            .setCancelable(false)
+            .show()
+    }
 }
