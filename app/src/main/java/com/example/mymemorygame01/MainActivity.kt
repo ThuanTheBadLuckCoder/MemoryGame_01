@@ -21,6 +21,12 @@ class MainActivity : AppCompatActivity() {
             val intent2 = Intent(this, Game02Activity::class.java)
             startActivity(intent2)
         }
+
+        val buttonChoice3 = findViewById<Button>(R.id.buttonChoice3)
+        buttonChoice3.setOnClickListener {
+            val intent3 = Intent(this, Game03Activity::class.java)
+            startActivity(intent3)
+        }
     }
 }
 

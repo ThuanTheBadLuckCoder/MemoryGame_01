@@ -18,7 +18,7 @@ class Game03Activity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_game)
+        setContentView(R.layout.game03_activity)
 
         cardsGridLayout = findViewById(R.id.cardsGridLayout)
         loadCards()
@@ -67,7 +67,7 @@ class Game03Activity : AppCompatActivity() {
             for (i in 0 until cardsGridLayout.childCount) {
                 val cardImageView = cardsGridLayout.getChildAt(i) as ImageView
                 if (i == correctCardIndex) {
-                    cardImageView.setImageResource(R.drawable.card_question)
+                    cardImageView.setImageResource(R.drawable.cardQuestion)
                 } else {
                     cardImageView.visibility = View.INVISIBLE
                 }

@@ -31,6 +31,11 @@
             android:exported="false">
         </activity>
 
+        <activity
+            android:name=".Game03Activity"
+            android:exported="false">
+        </activity>
+
     </application>
 
 </manifest>
