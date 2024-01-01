@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <GridLayout
+        android:id="@+id/cardsGridLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:rowCount="1"
+        android:columnCount="4"
+        android:padding="16dp"
+        android:alignmentMode="alignMargins"
+        android:columnOrderPreserved="false"
+        android:layout_centerInParent="true">
+
+        <!-- ImageView widgets will be added here dynamically -->
+
+    </GridLayout>
+
+    <Button
+        android:id="@+id/btnRevealAnswer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reveal Answer"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/cardsGridLayout"
+        android:layout_marginTop="24dp"/>
+
+    <!-- Other views like score, highscore, and restart button can be added here -->
+
+</RelativeLayout>
