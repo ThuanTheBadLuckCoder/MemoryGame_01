@@ -33,7 +33,7 @@ class Game03Activity : AppCompatActivity() {
     private fun loadCards() {
         // Load all card resources into the list (this is just a placeholder code, adjust it based on your actual drawable names)
         for (i in 1..21) {
-            val cardId = resources.getIdentifier("card0$i", "drawable", packageName)
+            val cardId = resources.getIdentifier("card$i", "drawable", packageName)
             cards.add(cardId)
         }
     }
@@ -45,20 +45,31 @@ class Game03Activity : AppCompatActivity() {
         // Randomly select one card to be the correct answer
         correctCardIndex = Random.nextInt(visibleCards.size)
 
+        // Clear previous cards
+        cardsGridLayout.removeAllViews()
+
         // Add ImageView widgets to GridLayout
-        for (i in visibleCards.indices) {
-            val cardImageView = ImageView(this).apply {
-                setImageResource(visibleCards[i])
-                layoutParams = GridLayout.LayoutParams().apply {
-                    width = 200
-                    height = 200
-                    rightMargin = 15
-                    topMargin = 15
+        for (i in 0 until 2) { // 2 rows
+            for (j in 0 until 2) { // 2 columns
+                val cardIndex = i * 2 + j
+                val cardImageView = ImageView(this).apply {
+                    setImageResource(visibleCards[cardIndex])
+                    layoutParams = GridLayout.LayoutParams(GridLayout.spec(i, 1f), GridLayout.spec(j, 1f)).apply {
+                        width = 0
+                        height = 0
+                        rightMargin = 15
+                        bottomMargin = 15
+                    }
+                    id = View.generateViewId()
+                    setOnClickListener { onCardClick(it) }
                 }
-                id = View.generateViewId()
+                cardsGridLayout.addView(cardImageView)
             }
-            cardsGridLayout.addView(cardImageView)
         }
+    }
+
+    private fun onCardClick(view: View) {
+        // Logic when a card is clicked can be implemented here
     }
 
     private fun revealAnswer() {
@@ -67,7 +78,7 @@ class Game03Activity : AppCompatActivity() {
             for (i in 0 until cardsGridLayout.childCount) {
                 val cardImageView = cardsGridLayout.getChildAt(i) as ImageView
                 if (i == correctCardIndex) {
-                    cardImageView.setImageResource(R.drawable.cardQuestion)
+                    cardImageView.setImageResource(R.drawable.cardquestion)
                 } else {
                     cardImageView.visibility = View.INVISIBLE
                 }

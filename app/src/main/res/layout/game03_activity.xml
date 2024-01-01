@@ -8,15 +8,13 @@
         android:id="@+id/cardsGridLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:rowCount="1"
-        android:columnCount="4"
+        android:rowCount="2"
+        android:columnCount="2"
         android:padding="16dp"
         android:alignmentMode="alignMargins"
         android:columnOrderPreserved="false"
         android:layout_centerInParent="true">
-
         <!-- ImageView widgets will be added here dynamically -->
-
     </GridLayout>
 
     <Button
@@ -27,7 +25,5 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/cardsGridLayout"
         android:layout_marginTop="24dp"/>
-
     <!-- Other views like score, highscore, and restart button can be added here -->
-
 </RelativeLayout>
