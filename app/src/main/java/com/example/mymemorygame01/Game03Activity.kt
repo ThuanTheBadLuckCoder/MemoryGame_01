@@ -43,6 +43,11 @@ class Game03Activity : AppCompatActivity() {
         )
     }
 
+    private fun startGame() {
+        displayRandomCards()
+        hideRandomCard()
+    }
+
     private fun displayRandomCards() {
         cardResourceIds = listOf(
             R.drawable.card01, R.drawable.card02, R.drawable.card03,
@@ -68,6 +73,7 @@ class Game03Activity : AppCompatActivity() {
         // Thay thế hình ảnh đó bằng cardquestion.png sau 3 giây
         Handler().postDelayed({
             imageViews[hiddenCardIndex].setImageResource(R.drawable.cardquestion)
+            revealAnswers()
         }, 3000) // Độ trễ 3000ms (3 giây)
     }
 
@@ -117,17 +123,35 @@ class Game03Activity : AppCompatActivity() {
         val selectedAnswerId = selectedImageView.drawable.constantState
 
         if (selectedAnswerId == resources.getDrawable(hiddenCardResourceId).constantState) {
-            // Người dùng chọn đúng
+            // User selected the correct answer
             Toast.makeText(this, "Correct! Preparing next round...", Toast.LENGTH_SHORT).show()
 
-            // Thời gian chờ trước khi bắt đầu vòng mới
+            // Delay before starting a new round
             Handler().postDelayed({
-                displayRandomCards() // Hiển thị lại các thẻ mới
-            }, 2000) // Độ trễ 2000ms (2 giây)
+                // Clear the answers and start a new round
+                resetAnswers()
+            }, 2000) // Delay for 2 seconds
         } else {
-            // Người dùng chọn sai
+            // User selected the wrong answer
             Toast.makeText(this, "Wrong answer! Game Over.", Toast.LENGTH_SHORT).show()
-            // Có thể thêm lựa chọn để chơi lại ở đây
+            // You can add an option to play again here
+        }
+    }
+    private fun resetAnswers() {
+        // Reset cardResourceIds and images
+        cardResourceIds.clear()
+        imageViews.forEach { imageView ->
+            imageView.setImageResource(0) // Clear the images
+        }
+
+        // Start a new round by displaying random cards and hiding a random card
+        startGame()
+    }
+
+    private fun revealAnswers() {
+        // Show the answers
+        answerImageViews.forEachIndexed { index, resourceId ->
+            answerImageViews[index].setImageResource(cardResourceIds[index])
         }
     }
 
