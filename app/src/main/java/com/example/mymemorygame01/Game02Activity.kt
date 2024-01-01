@@ -2,7 +2,9 @@ package com.example.mymemorygame01
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +22,11 @@ class Game02Activity : AppCompatActivity() {
     private val selectedCards = mutableListOf<String>()
     private var round = 1
     private var lastSelectedCard: String? = null
-    private var previousRoundCards = mutableListOf<String>()
+//    private var previousRoundCards = mutableListOf<String>()
+    private var score = 0 // Điểm hiện tại của người chơi
+    private var highScore = 0 // Điểm cao nhất đạt được
+    private lateinit var scoreTextView: TextView
+    private lateinit var highScoreTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,15 +39,27 @@ class Game02Activity : AppCompatActivity() {
             findViewById(R.id.cardImageView4),
             findViewById(R.id.cardImageView5)
         )
+        scoreTextView = findViewById(R.id.scoreTextView)
+        highScoreTextView = findViewById(R.id.highScoreTextView)
 
+        val sharedPreferences = getSharedPreferences("game_prefs", MODE_PRIVATE)
+        highScore = sharedPreferences.getInt("high_score", 0)
         initGame()
+
+        val restartButton: Button = findViewById(R.id.restartButton)
+        restartButton.setOnClickListener {
+            restartGame() // Gọi hàm restartGame() khi nút Restart được nhấn
+        }
+        updateHighScore()
     }
 
     private fun initGame() {
+        score = 0 // Reset điểm số khi bắt đầu game mới
         selectedCards.clear()
         lastSelectedCard = null
         selectedCards.addAll(cardImages.shuffled().take(5))
         updateCardDisplay()
+        updateScoreDisplay() // Cập nhật điểm số và điểm cao nhất
     }
 
     private fun updateCardDisplay() {
@@ -65,14 +83,32 @@ class Game02Activity : AppCompatActivity() {
     private fun processSelection(cardName: String) {
         if (round == 1) {
             prepareNextRound(cardName)
+            updateHighScore()
             round++
         } else if (cardName == lastSelectedCard) {
-            Toast.makeText(this, "Correct! Moving to next round.", Toast.LENGTH_SHORT).show()
+            score++
+            updateHighScore()
+//            Toast.makeText(this, "Correct! Moving to next round.", Toast.LENGTH_SHORT).show()
             prepareNextRound(cardName)
             round++
         } else {
             showLostDialog()
         }
+        updateScoreDisplay()
+    }
+    private fun updateHighScore() {
+        if (score > highScore) {
+            highScore = score
+            val sharedPreferences = getSharedPreferences("game_prefs", MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putInt("high_score", highScore)
+            editor.apply()
+        }
+        highScoreTextView.text = "High Score: $highScore"
+    }
+
+    private fun updateScoreDisplay() {
+        scoreTextView.text = "Score: $score" // Cập nhật hiển thị điểm số
     }
 
     private fun prepareNextRound(selectedCard: String) {
@@ -98,7 +134,7 @@ class Game02Activity : AppCompatActivity() {
 
 
     private fun showLostDialog() {
-        // Vô hiệu hóa click vào các ImageView
+        updateHighScore()
         cardImageViews.forEach { imageView ->
             imageView.isClickable = false
         }
@@ -106,7 +142,7 @@ class Game02Activity : AppCompatActivity() {
         // Tạo và hiển thị AlertDialog
         AlertDialog.Builder(this)
             .setTitle("Game Over")
-            .setMessage("You lost the game. Do you want to exit?")
+            .setMessage("You lost the game. Your score: $score. Do you want to exit?")
             .setPositiveButton("Exit") { dialog, which ->
                 // Thoát khỏi Activity
                 finish()
@@ -114,9 +150,13 @@ class Game02Activity : AppCompatActivity() {
             .setNegativeButton("Cancel") { dialog, which ->
                 // Nếu người chơi chọn 'Cancel', cho phép chơi lại
                 dialog.dismiss()
-                initGame()
+                initGame() // Reset game sẽ reset điểm
             }
             .setCancelable(false)
             .show()
+    }
+    private fun restartGame() {
+        finish()
+        startActivity(intent)
     }
 }
