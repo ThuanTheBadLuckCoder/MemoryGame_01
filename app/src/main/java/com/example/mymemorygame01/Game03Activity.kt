@@ -2,87 +2,36 @@ package com.example.mymemorygame01
 
 import android.os.Bundle
 import android.os.Handler
-import android.view.View
-import android.widget.Button
 import android.widget.GridLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import kotlin.random.Random
 
 class Game03Activity : AppCompatActivity() {
 
-    private lateinit var cardsGridLayout: GridLayout
-    private var cards = mutableListOf<Int>()
-    private var visibleCards = mutableListOf<Int>()
-    private var correctCardIndex = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.game03_activity)
-
-        cardsGridLayout = findViewById(R.id.cardsGridLayout)
-        loadCards()
-        displayCards()
-
-        val btnRevealAnswer: Button = findViewById(R.id.btnRevealAnswer)
-        btnRevealAnswer.setOnClickListener {
-            revealAnswer()
-        }
+        displayRandomCards()
     }
 
-    private fun loadCards() {
-        // Load all card resources into the list (this is just a placeholder code, adjust it based on your actual drawable names)
-        for (i in 1..21) {
-            val cardId = resources.getIdentifier("card$i", "drawable", packageName)
-            cards.add(cardId)
-        }
-    }
+    private fun displayRandomCards() {
+        // Danh sách chứa ID của tất cả các hình ảnh từ card01 đến card21
+        val cardResourceIds = listOf(
+            R.drawable.card01, R.drawable.card02, R.drawable.card03,
+            R.drawable.card04, R.drawable.card05, R.drawable.card06,
+            R.drawable.card07, R.drawable.card08, R.drawable.card09,
+            R.drawable.card10, R.drawable.card11, R.drawable.card12,
+            R.drawable.card13, R.drawable.card14, R.drawable.card15,
+            R.drawable.card16, R.drawable.card17, R.drawable.card18,
+            R.drawable.card19, R.drawable.card20, R.drawable.card21
+        ).shuffled().take(4) // Lấy ngẫu nhiên 4 ID từ danh sách
 
-    private fun displayCards() {
-        // Randomly select four cards to display
-        visibleCards = cards.shuffled().take(4).toMutableList()
-
-        // Randomly select one card to be the correct answer
-        correctCardIndex = Random.nextInt(visibleCards.size)
-
-        // Clear previous cards
-        cardsGridLayout.removeAllViews()
-
-        // Add ImageView widgets to GridLayout
-        for (i in 0 until 2) { // 2 rows
-            for (j in 0 until 2) { // 2 columns
-                val cardIndex = i * 2 + j
-                val cardImageView = ImageView(this).apply {
-                    setImageResource(visibleCards[cardIndex])
-                    layoutParams = GridLayout.LayoutParams(GridLayout.spec(i, 1f), GridLayout.spec(j, 1f)).apply {
-                        width = 0
-                        height = 0
-                        rightMargin = 15
-                        bottomMargin = 15
-                    }
-                    id = View.generateViewId()
-                    setOnClickListener { onCardClick(it) }
-                }
-                cardsGridLayout.addView(cardImageView)
-            }
-        }
-    }
-
-    private fun onCardClick(view: View) {
-        // Logic when a card is clicked can be implemented here
-    }
-
-    private fun revealAnswer() {
-        // Hide all cards and show a question mark instead after a delay
-        Handler().postDelayed({
-            for (i in 0 until cardsGridLayout.childCount) {
-                val cardImageView = cardsGridLayout.getChildAt(i) as ImageView
-                if (i == correctCardIndex) {
-                    cardImageView.setImageResource(R.drawable.cardquestion)
-                } else {
-                    cardImageView.visibility = View.INVISIBLE
-                }
-            }
-        }, 3000) // Hide after 3 seconds
+        // Gán tài nguyên hình ảnh cho từng ImageView
+        findViewById<ImageView>(R.id.imageView1).setImageResource(cardResourceIds[0])
+        findViewById<ImageView>(R.id.imageView2).setImageResource(cardResourceIds[1])
+        findViewById<ImageView>(R.id.imageView3).setImageResource(cardResourceIds[2])
+        findViewById<ImageView>(R.id.imageView4).setImageResource(cardResourceIds[3])
     }
 }
