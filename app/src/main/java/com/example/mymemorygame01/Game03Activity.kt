@@ -16,6 +16,7 @@ class Game03Activity : AppCompatActivity() {
 
     private lateinit var answerImageViews: Array<ImageView>
     private var hiddenCardResourceId = 0
+    private var isRoundOver = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,7 +93,9 @@ class Game03Activity : AppCompatActivity() {
     private fun setupAnswerListeners() {
         answerImageViews.forEach { imageView ->
             imageView.setOnClickListener {
-                checkAnswer(imageView)
+                if (!isRoundOver) {
+                    checkAnswer(imageView)
+                }
             }
         }
     }
@@ -103,12 +106,11 @@ class Game03Activity : AppCompatActivity() {
         if (selectedAnswerId == resources.getDrawable(hiddenCardResourceId).constantState) {
             // User selected the correct answer
             Toast.makeText(this, "Correct! Preparing next round...", Toast.LENGTH_SHORT).show()
-
+            isRoundOver = true
             // Delay before starting a new round
             Handler().postDelayed({
                 // Clear the answers and start a new round
                 resetGame()
-                revealAnswers()
             }, 2000) // Delay for 2 seconds
         } else {
             // User selected the wrong answer
@@ -118,12 +120,16 @@ class Game03Activity : AppCompatActivity() {
     }
 
     private fun resetGame() {
+        answerImageViews.forEach {
+            imageView -> imageView.setImageResource(R.drawable.cardquestion)
+        }
+
         // Clear the card resource IDs and images
         cardResourceIds.clear()
         imageViews.forEach { imageView ->
             imageView.setImageResource(0) // Clear the images
         }
-
+        isRoundOver = false
         // Start a new round by displaying random cards and hiding a random card
         startGame()
     }
@@ -133,5 +139,6 @@ class Game03Activity : AppCompatActivity() {
         answerImageViews.forEachIndexed { index, resourceId ->
             answerImageViews[index].setImageResource(cardResourceIds[index])
         }
+
     }
 }
